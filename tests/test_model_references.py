@@ -263,7 +263,8 @@ class TestRedeclaration:
         src = """
 from typing import Union
 
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import DeclarativeBase, Mapped, declared_attr, mapped_column, relationship
 
 
 class Base(DeclarativeBase):
@@ -281,18 +282,22 @@ class Team(Base):
 
 
 class OwnedMixin:
-    owner: Mapped["User"] = relationship()
+    owner_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+
+    @declared_attr
+    def owner(cls) -> Mapped["User"]:
+        return relationship()
 
 
 class Project(OwnedMixin, Base):
     __tablename__ = "project"
     id: Mapped[int] = mapped_column(primary_key=True)
-    owner: Mapped[Union["User", "Team"]] = relationship()
+    owner: Mapped[Union["User", "Team"]] = relationship("User")
 """
         entities = _parse(tmp_path, src)
         assert entities["Project"].relationships == []
         edges = [line for line in generate_mermaid(entities).splitlines() if "--" in line]
-        assert not any(line.strip().startswith("Project ") for line in edges)
+        assert not any(line.endswith(': "owner"') for line in edges)
 
 
 class TestQualifiedRelationshipCall:

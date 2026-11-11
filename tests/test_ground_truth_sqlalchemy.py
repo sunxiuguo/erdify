@@ -88,7 +88,6 @@ KNOWN_DIFFERENCES = {
     "imperative_table": "#297: a class mapped with __table__ = Table(...) is not drawn",
     "map_imperatively": "#306: classes mapped with registry.map_imperatively() are not drawn",
     "core_tables": "#305: Core tables other than association tables are not drawn",
-    "mixins": "#298: a relationship from a @declared_attr on a mixin is not read",
     "one_to_one_required_reverse": (
         "#299: a to-one reference from the referenced side is always optional"
     ),
@@ -139,6 +138,10 @@ LIMITATIONS = {
         "limitations.md: schema= is ignored"
     ),
     "bare_relationship": "limitations.md: relationships need an annotation",
+    "test_model_references.py::TestRedeclaration"
+    ".test_unresolvable_redeclaration_shadows_the_inherited_relationship.src": (
+        "limitations.md: an ambiguous union annotation names no single relationship target"
+    ),
     "sqlmodel_sa_column_foreign_key": "limitations.md: foreign keys hidden in sa_column",
     "test_column_annotations.py::TestSqlAlchemyDetection"
     ".test_classic_column_only_class_not_detected.source": (
@@ -176,13 +179,6 @@ EXPECTED_REJECTED = {
     "test_ground_truth_sqlalchemy.py::test_reference_rejects_a_table_without_primary_key": (
         "the harness's own test of a rejected source"
     ),
-    "test_relationship_pairing.py::TestParserSpellings.MIXIN": (
-        "relationship() on a plain mixin needs @declared_attr (#298)"
-    ),
-    "test_model_references.py::TestRedeclaration"
-    ".test_unresolvable_redeclaration_shadows_the_inherited_relationship.src": (
-        "relationship() on a plain mixin needs @declared_attr (#298)"
-    ),
 }
 
 # Sources that are not a self-contained model module, so there is nothing to
@@ -192,6 +188,9 @@ OTHER_FILE = "an alias from another file of the test"
 COMPLETED = "a source the test completes with a parameter"
 TEMPLATE = "a str.format template"
 EXPECTED_UNLOADABLE = {
+    "test_declared_attr.py::test_unsupported_declaration_still_shadows_a_base.node": (
+        "an isolated class body for a dialect unit test, not a runnable model module"
+    ),
     "test_annotated_metadata.py::TestInlineAnnotated.test_other_metadata_is_ignored"
     ".entities": STRING_METADATA,
     "test_annotated_metadata.py::TestCopilotRound2.test_nested_annotated_alias"

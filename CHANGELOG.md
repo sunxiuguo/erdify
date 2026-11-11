@@ -24,6 +24,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- SQLAlchemy mixin relationships declared with an annotated `@declared_attr`
+  method that directly returns `relationship(...)` are now read, including
+  optionality, collection targets, `back_populates` and inherited overrides
+  ([#298](https://github.com/devsuit-berlin/erdify/issues/298)).
+
 - Django models without `Meta.db_table` now get the table name Django creates,
   `<app_label>_<model name>`: the class name lower-cased (`OrderItem` →
   `shop_orderitem`, not `order_item`) and prefixed with the app label. The app
@@ -49,6 +54,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ([#275](https://github.com/devsuit-berlin/erdify/issues/275)).
 
 ### Output changes
+
+SQLAlchemy diagrams and JSON now include previously missing relationships
+declared through the supported `@declared_attr` form. Regenerate the output
+once if you gate CI on `--check`.
 
 Every Django model without `Meta.db_table` changes its table name, in the
 diagram, in JSON `table_name` / `foreign_table`, and for `--exclude` patterns

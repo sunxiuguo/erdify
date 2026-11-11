@@ -7,7 +7,7 @@ and in which of these member kinds they accept.
 """
 
 import ast
-from typing import Dict, List, Tuple
+from typing import Dict, Iterable, List, Tuple
 
 from ...config import FieldInfo
 from ..annotations import (
@@ -30,6 +30,10 @@ class AnnotatedDialect(Dialect):
     treat a field typed as another model as a relationship.
     """
 
+    def body_members(self, class_node: ast.ClassDef) -> Iterable[ast.stmt]:
+        """Statements that declare attributes, in source order."""
+        return class_node.body
+
     def class_fields(
         self, class_node: ast.ClassDef, concrete: str
     ) -> Tuple[Dict[str, FieldInfo], Dict[str, _Rel]]:
@@ -37,7 +41,7 @@ class AnnotatedDialect(Dialect):
         fields: Dict[str, FieldInfo] = {}
         relationships: Dict[str, _Rel] = {}
 
-        for node in class_node.body:
+        for node in self.body_members(class_node):
             if isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name):
                 field_name = node.target.id
                 if self.reads_annotated_columns:

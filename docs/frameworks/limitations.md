@@ -212,6 +212,31 @@ Django is the exception: its relationship fields are calls, so string targets
 (`"Author"`, `"catalog.Author"`, `"self"`) and direct class references are all
 resolved from the call argument.
 
+### SQLAlchemy relationships on mixins
+
+SQLAlchemy requires a mixin relationship to use `@declared_attr`. erdify reads
+a method with a return annotation and a single direct `return relationship(...)`:
+
+```python
+class OwnedMixin:
+    owner_id: Mapped[int] = mapped_column(ForeignKey("owner.id"))
+
+    @declared_attr
+    def owner(cls) -> Mapped["Owner"]:
+        return relationship("Owner")
+```
+
+Bare and module-qualified names (`orm.declared_attr`, `orm.relationship`) work,
+as do an optional docstring and `@classmethod` below `@declared_attr`. The return annotation supplies
+the target, cardinality and optionality; `back_populates` and `secondary` follow
+the same rules as an annotated relationship attribute. Inherited declarations
+follow the MRO, and a subclass's declaration replaces the inherited one.
+
+No method is executed. Computed bodies (conditionals, helper calls or local
+assignments), other decorator combinations, missing return annotations, `declared_attr.directive` /
+`declared_attr.cascading`, and declared columns are not read. This support does
+not change the limitations for `__tablename__` or `__table_args__` above.
+
 ## Both sides of a relationship
 
 A relationship declared on both models (`User.posts` and `Post.user`) is drawn
